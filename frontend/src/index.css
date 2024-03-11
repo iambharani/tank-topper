@@ -1,0 +1,10 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#root { /* Adjust this selector if you're using a different main wrapper */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
