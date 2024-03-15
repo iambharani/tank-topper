@@ -136,7 +136,6 @@ const StationList = () => {
     <Header as="h2">Stations Near You</Header>
     {selectedStation ? (
       <>
-        <Button onClick={() => setSelectedStation(null)}>Back to List</Button>
         <MapComponent
           latitude={selectedStation.latitude}
           longitude={selectedStation.longitude}
@@ -144,6 +143,8 @@ const StationList = () => {
           userLongitude={userLocationCord.longitude}
           isFullScreen={true} // You might need to adjust your MapComponent to use this prop
         />
+                <Button onClick={() => setSelectedStation(null)}>Back to List</Button>
+
       </>
     ) : (
       <Card.Group>{renderStationList()}</Card.Group>

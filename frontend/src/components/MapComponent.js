@@ -10,17 +10,12 @@ const MapComponent = ({
   userLatitude,
   userLongitude,
 }) => {
-
-  console.log(latitude,
-    longitude,
-    isFullScreen,
-    userLatitude,
-    userLongitude,);
+  console.log(latitude, longitude, isFullScreen, userLatitude, userLongitude);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const mapContainerRef = useRef(null); // Assuming you have a ref for the map container
   const containerStyle = {
     width: "100%",
-    height: isFullScreen ? "100vh" : "400px", // Full screen height or fixed height
+    height: isFullScreen ? "90vh" : "400px", // Full screen height or fixed height
     position: isFullScreen ? "fixed" : "relative", // Make position fixed to cover the full screen
     top: 0,
     left: 0,
@@ -57,9 +52,7 @@ const MapComponent = ({
     };
 
     const initializeMap = (accessToken) => {
-      console.log(accessToken);
-      // Assuming mappls and mappls_plugin are correctly initialized and available
-      // Replace 'mappls' and 'mappls_plugin' with the actual objects/constructors as necessary
+      console.log("Access Token:", accessToken);
       const mapplsClassObject = new mappls(accessToken);
       const mapplsPluginObject = new mappls_plugin();
 
@@ -71,21 +64,33 @@ const MapComponent = ({
 
           if (mapContainerRef.current) {
             const map = new mapplsClassObject.Map(mapContainerRef.current, {
-              center: [longitude, latitude],
+              center: [
+                (parseFloat(longitude) + parseFloat(userLongitude)) / 2,
+                (parseFloat(latitude) + parseFloat(userLatitude)) / 2,
+              ],
               zoom: 12,
             });
 
             map.on("load", () => {
               setIsMapLoaded(true);
-              // Once the map is loaded, add direction functionality
+
+              console.log(
+                "Requesting directions from:",
+                `${userLongitude},${userLatitude}`,
+                "to:",
+                `${longitude},${latitude}`
+              );
               mapplsPluginObject.direction(
                 {
                   map: map,
-                  start: `${userLongitude},${userLatitude}`,
-                  end: `${longitude},${latitude}`,
+                  start: `${userLatitude},${userLongitude}`,
+                  end: `${latitude},${longitude}`,
                 },
                 (e) => {
                   console.log("Direction response:", e);
+                  if (e.error) {
+                    console.error("Direction API error:", e.error);
+                  }
                 }
               );
             });
@@ -106,6 +111,7 @@ const MapComponent = ({
     <div id="map" ref={mapContainerRef} style={containerStyle}>
       {/* Map will be attached to this div */}
     </div>
+    
   );
 };
 
