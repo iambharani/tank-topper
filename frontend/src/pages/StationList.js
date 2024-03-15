@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Header, Card,Button } from "semantic-ui-react";
+import { Container, Header, Card, Button } from "semantic-ui-react";
 import StationCard from "../components/StationCard"; // Adjust the path as necessary
 import * as turf from "@turf/turf";
 import MapComponent from "../components/MapComponent";
+
 const StationList = () => {
   const [stations, setStations] = useState([]);
   const [sortedStations, setSortedStations] = useState([]);
@@ -65,15 +66,12 @@ const StationList = () => {
   }, []);
 
   useEffect(() => {
-    if (
-      userLocationCord.latitude &&
-      userLocationCord.longitude &&
-      stations.length > 0
-    ) {
-      const sorted = sortStationsByProximity();
+    if (userLocationCord.latitude && userLocationCord.longitude && stations.length > 0) {
+      const sorted = sortStationsByProximity().slice(0, 3); // Take only the first three
       setSortedStations(sorted);
     }
-  }, [userLocationCord, stations]); // Dependency array includes both userLocationCord and stations
+  }, [userLocationCord, stations]);
+
 
   const safelyParseFloat = (str) => {
     const num = parseFloat(str);
@@ -108,7 +106,7 @@ const StationList = () => {
     return stations.map((station) => {
       const normalizedStationData = keysToLowerCase(station);
 
-      console.log("station",station);
+      // console.log("station",station);
       const stationLatitude = safelyParseFloat(normalizedStationData.latitude);
       const stationLongitude = safelyParseFloat(normalizedStationData.longitude);
   
@@ -127,29 +125,28 @@ const StationList = () => {
     console.log("station", station);
     setSelectedStation(station);
   };
+  const renderStationList = () => {
+    const stationsToDisplay = selectedStation ? [selectedStation] : sortedStations;
+    return stationsToDisplay.map((station, index) => (
+      <StationCard key={index} station={station} onSelect={handleSelectStation} />
+    ));
+  };
   return (
     <Container className="container">
     <Header as="h2">Stations Near You</Header>
     {selectedStation ? (
-      // Show map and a back button when a station is selected
       <>
-        <Button onClick={handleBackToList}>Back to List</Button>
+        <Button onClick={() => setSelectedStation(null)}>Back to List</Button>
         <MapComponent
           latitude={selectedStation.latitude}
           longitude={selectedStation.longitude}
+          userLatitude={userLocationCord.latitude}
+          userLongitude={userLocationCord.longitude}
+          isFullScreen={true} // You might need to adjust your MapComponent to use this prop
         />
       </>
     ) : (
-      // Show the list of stations when none is selected
-      <Card.Group>
-        {sortedStations.map((station, index) => (
-          <StationCard
-            key={index}
-            station={station}
-            onSelect={handleSelectStation}
-          />
-        ))}
-      </Card.Group>
+      <Card.Group>{renderStationList()}</Card.Group>
     )}
   </Container>
   );

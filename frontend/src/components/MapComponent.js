@@ -1,46 +1,110 @@
-import React, { useEffect, useRef, useState } from "react";
-import { mappls } from "mappls-web-maps";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
+// Ensure you've imported mappls and mappls_plugin as needed
+import { mappls, mappls_plugin } from "mappls-web-maps";
 
-const MapComponent = ({ latitude, longitude }) => {
-  const mapContainerRef = useRef(null);
+const MapComponent = ({
+  latitude,
+  longitude,
+  isFullScreen,
+  userLatitude,
+  userLongitude,
+}) => {
+
+  console.log(latitude,
+    longitude,
+    isFullScreen,
+    userLatitude,
+    userLongitude,);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-
+  const mapContainerRef = useRef(null); // Assuming you have a ref for the map container
+  const containerStyle = {
+    width: "100%",
+    height: isFullScreen ? "100vh" : "400px", // Full screen height or fixed height
+    position: isFullScreen ? "fixed" : "relative", // Make position fixed to cover the full screen
+    top: 0,
+    left: 0,
+    zIndex: isFullScreen ? 1000 : 1, // Ensure it's above other content
+  };
   useEffect(() => {
-    if (isMapLoaded) return; // Prevent re-initialization if the map is already loaded
-  
-    const mapplsClassObject = new mappls();
-    let map;
-  
-    mapplsClassObject.initialize("1012bcddd37d7139c30af8d27d91502e", { map: true }, () => {
-      console.log("Initialization complete");
-  
-      if (mapContainerRef.current) {
-        map = new mapplsClassObject.Map(mapContainerRef.current, {
-          center: [longitude, latitude],
-          zoom: 5,
-        });
-  
-        map.on("load", () => {
-          setIsMapLoaded(true);
-        });
+    if (isMapLoaded) return;
+
+    const fetchAccessToken = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost/tank-topper/backend/token_generator.php"
+        );
+        const cleanResponseData = response.data.replace(
+          /^\/\/ token_generator\.php\r\n/,
+          ""
+        );
+        const result = JSON.parse(cleanResponseData);
+        console.log("Parsed Response Data:", result);
+
+        // Manually parse the JSON string into an object
+        console.log("Access Token:", result.access_token); // This should log the actual access token
+
+        if (result.access_token) {
+          initializeMap(result.access_token); // Initialize the map with the access token
+        } else {
+          console.error(
+            "Access token is undefined. Check the response structure and parsing."
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching access token:", error);
       }
-    });
-  
-    // return () => {
-    // //   if (map) {
-    // //     map.remove(); // Assuming `remove` is the method to properly clean up the map instance
-    // //   }
-    // };
-  }, [latitude, longitude]); // Depend on latitude and longitude to re-initialize
-  
+    };
+
+    const initializeMap = (accessToken) => {
+      console.log(accessToken);
+      // Assuming mappls and mappls_plugin are correctly initialized and available
+      // Replace 'mappls' and 'mappls_plugin' with the actual objects/constructors as necessary
+      const mapplsClassObject = new mappls(accessToken);
+      const mapplsPluginObject = new mappls_plugin();
+
+      mapplsClassObject.initialize(
+        accessToken,
+        { map: true, plugins: ["direction"] },
+        () => {
+          console.log("Mappls Initialization complete");
+
+          if (mapContainerRef.current) {
+            const map = new mapplsClassObject.Map(mapContainerRef.current, {
+              center: [longitude, latitude],
+              zoom: 12,
+            });
+
+            map.on("load", () => {
+              setIsMapLoaded(true);
+              // Once the map is loaded, add direction functionality
+              mapplsPluginObject.direction(
+                {
+                  map: map,
+                  start: `${userLongitude},${userLatitude}`,
+                  end: `${longitude},${latitude}`,
+                },
+                (e) => {
+                  console.log("Direction response:", e);
+                }
+              );
+            });
+          }
+        }
+      );
+    };
+
+    fetchAccessToken();
+
+    // Cleanup function to reset map loaded state if necessary
+    return () => {
+      // Implement any necessary cleanup
+    };
+  }, [latitude, longitude, isMapLoaded, userLatitude, userLongitude]); // Ensure dependencies are correctly listed
 
   return (
-    <div
-      ref={mapContainerRef}
-      id="map-container" // Keep the static ID if only one map instance is expected at a time
-      style={{ width: "100%", height: "400px" }}
-    >
-      {/* {isMapLoaded ? "Map Loaded" : "Loading Map..."} */}
+    <div id="map" ref={mapContainerRef} style={containerStyle}>
+      {/* Map will be attached to this div */}
     </div>
   );
 };
