@@ -25,19 +25,19 @@ const LoginComponent = () => {
       console.log("response", response.data);
 
       if (response.data.success) {
-        // Assuming userDetails includes the isActive flag
-        const { userDetails } = response.data;
-        dispatch(setCurrentUser(userDetails));
+        // Assuming user includes the isActive flag
+        const { user } = response.data;
+        dispatch(setCurrentUser(user));
 
-        // Store userDetails in localStorage
-        localStorage.setItem('userDetails', JSON.stringify(userDetails));
+        // Store user in localStorage
+        localStorage.setItem('user', JSON.stringify(user));
         alert(response.data.message);
 
         // Redirect based on the isActive flag and presence of vehicles
-        if (!userDetails.isActive) {
+        if (!user.isActive) {
           // If isActive is false, redirect to dashboard to add a vehicle
           navigate('/dashboard');
-        } else if (userDetails.vehicles && userDetails.vehicles.length > 0) {
+        } else if (user.vehicles && user.vehicles.length > 0) {
           // If isActive is true and there are vehicles, redirect to stations
           navigate('/stations');
         } else {

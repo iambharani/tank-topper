@@ -1,0 +1,33 @@
+.image-upload-container {
+    position: relative;
+    display: flex;
+  }
+  
+  .image-upload-container:hover .upload-icon {
+    display: block;
+  }
+  
+  .upload-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Dim the image a bit */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    display: none; /* Hide by default */
+    cursor: pointer;
+  }
+  
+  .upload-icon input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Hide the actual input, but keep it functional */
+    cursor: pointer;
+  }
+  

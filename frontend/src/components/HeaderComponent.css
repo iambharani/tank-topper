@@ -1,0 +1,31 @@
+.custom-menu {
+    background-color: rgba(0, 183, 255, 0.8); /* A semi-transparent version of your app's primary blue */
+    color: #ffffff; /* White text for contrast */
+    position: static;
+    height: 60px; /* Adjustable based on content */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 2px solid #007cb2; /* A darker blue for subtle separation */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+}
+
+.custom-menu-item {
+    color: #ffffff !important; /* White text for better contrast and visibility */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions for interactive feedback */
+    padding: 10px 15px;
+    border-radius: 5px; /* Optional: adds rounded corners for a softer look */
+    display: flex;
+    align-items: center; /* Center items vertically */
+}
+
+.custom-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* A lighter, semi-transparent white for hover */
+    color: #e0f7ff; /* A very light blue for a subtle hover effect */
+}
+
+.custom-menu-item i, .custom-menu-item .icon {
+    color: inherit; /* Ensures icons match the text color */
+    margin-right: 8px; /* Spacing between icon and text */
+}

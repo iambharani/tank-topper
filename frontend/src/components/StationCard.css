@@ -1,0 +1,36 @@
+/* Add this to your main.stationcard-css or equivalent stylesheet file */
+.stationcard-card {
+    cursor: pointer;
+    border-radius: 8px;
+    background: linear-gradient(to right, #89f7fe, #66a6ff) !important;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.2s ease !important;
+    width: fit-content; /* Adjusts width based on content, with some limits based on the container */
+    min-width: 300px; /* Minimum width to ensure cards don't get too narrow */
+    /* Optional: max-width to ensure cards don't get excessively wide */
+    max-width: 90%; /* Adjust as needed, based on your layout's requirements */
+    margin: 10px; /* Adjusted to ensure spacing around cards */
+    padding: 10px; /* Padding inside cards for content spacing */
+}
+
+
+.stationcard-card:hover {
+    background: linear-gradient(to right, #8fd3fe, #77a7ff) !important;
+    transform: scale(1.05);
+}
+
+.stationcard-card-content {
+    transition: transform 0.2s ease !important;
+}
+
+.stationcard-card-icon {
+    color: inherit !important;
+    transition: color 0.5s ease !important;
+}
+
+.stationcard-card-header, .stationcard-card-meta, .stationcard-card-description {
+    color: inherit;
+}

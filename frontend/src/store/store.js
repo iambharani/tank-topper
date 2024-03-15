@@ -10,7 +10,7 @@ const rootReducer = combineReducers({
 });
 
 // Example initialization of Redux store state from local storage
-const persistedState = localStorage.getItem('userDetails') ? { auth: { user: JSON.parse(localStorage.getItem('userDetails')) } } : {};
+const persistedState = localStorage.getItem('user') ? { auth: { user: JSON.parse(localStorage.getItem('user')) } } : {};
 
 // Create the store with the persisted state
 const store = createStore(

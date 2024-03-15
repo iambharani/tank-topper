@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import  store  from './store/store';
 import { Provider } from 'react-redux';
+<script src="https://apis.mappls.com/advancedmaps/api/1012bcddd37d7139c30af8d27d91502e/map_sdk?v=3.0&layer=vector"></script>
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

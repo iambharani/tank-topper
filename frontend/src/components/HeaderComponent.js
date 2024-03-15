@@ -1,60 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Dropdown, Icon, Modal, Button, Form } from 'semantic-ui-react';
+import { Menu, Dropdown, Icon } from 'semantic-ui-react';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from './../actions/authActions';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirects
 import 'semantic-ui-css/semantic.min.css';
+import './HeaderComponent.css';
 
-const HeaderComponent = ({ user, onLogout, vehicles, onAddVehicle, onEditVehicle, onRemoveVehicle }) => {
+const HeaderComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Instantiate useNavigate for redirects
 
   useEffect(() => {
-    // Assume a user object with an isAuthenticated method or property
-    if (user && user.isAuthenticated) {
+    const user = localStorage.getItem('user');
+    if (user) {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
     }
-  }, [user]);
+  }, []);
 
-  // Vehicle list dropdown items
-  const vehicleDropdownItems = vehicles.map((vehicle) => ({
-    key: vehicle.id,
-    text: `${vehicle.make} ${vehicle.model} - ${vehicle.number}`,
-    value: vehicle.id,
-    onClick: () => console.log('Vehicle selected:', vehicle)
-  }));
+  const handleLogout = () => {
+    dispatch(logoutUser()); // Dispatch the logoutUser action
+    localStorage.removeItem('user'); // Clear user from localStorage
+    setIsLoggedIn(false); // Update the isLoggedIn state
+    navigate('/'); // Redirect to the home/welcome page
+  };
 
   return (
-    <Menu>
-      <Menu.Item name='home'>
-        <Icon name='home' /> Home
-      </Menu.Item>
+    <Menu className="custom-menu">
+    <Menu.Item name='home' onClick={() => navigate('/')} className="custom-menu-item">
+      <Icon name='home' /> Home
+    </Menu.Item>
 
       {isLoggedIn ? (
-        <>
-          <Dropdown item text='Vehicles'>
+        <Menu.Menu position='right'>
+          <Dropdown item icon='user' simple>
             <Dropdown.Menu>
-              {vehicleDropdownItems.map((item) => (
-                <Dropdown.Item key={item.key} {...item} />
-              ))}
-              <Dropdown.Divider />
-              <Dropdown.Item onClick={onAddVehicle}>Add New Vehicle</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate('/dashboard')}>
+                Profile Settings
+              </Dropdown.Item>
+              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-
-          <Menu.Menu position='right'>
-            <Dropdown item icon='user' simple>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => console.log('Profile Settings')}>
-                  Profile Settings
-                </Dropdown.Item>
-                <Dropdown.Item onClick={onLogout}>Logout</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Menu.Menu>
-        </>
+        </Menu.Menu>
       ) : (
         <Menu.Menu position='right'>
-          <Menu.Item name='login'>Login</Menu.Item>
-          <Menu.Item name='signup'>Signup</Menu.Item>
+          <Menu.Item name='login' onClick={() => navigate('/login')}>Login</Menu.Item>
+          <Menu.Item name='signup' onClick={() => navigate('/signup')}>Signup</Menu.Item>
         </Menu.Menu>
       )}
     </Menu>

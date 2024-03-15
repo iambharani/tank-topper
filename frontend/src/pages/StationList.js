@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Dropdown,
-  Container,
-  Header,
-  Button,
-  List,
-  Card,
-} from "semantic-ui-react";
+import { Container, Header, Card,Button } from "semantic-ui-react";
 import StationCard from "../components/StationCard"; // Adjust the path as necessary
-
+import * as turf from "@turf/turf";
+import MapComponent from "../components/MapComponent";
 const StationList = () => {
   const [stations, setStations] = useState([]);
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [sortedStations, setSortedStations] = useState([]);
+  const [userLocationCord, setUserLocationCord] = useState({
+    latitude: null,
+    longitude: null,
+  });
+  const [selectedStation, setSelectedStation] = useState(null);
+
   const apiUrl = "http://localhost/tank-topper/backend/getStations.php";
+  // Replace 'YOUR_OPENCAGE_API_KEY' with your actual OpenCage API key.
+  const reverseGeocodingUrl = `https://api.opencagedata.com/geocode/v1/json?key=82a7ceb08abf48009f857023ebf4bdac`;
 
   useEffect(() => {
     // Attempt to fetch stations either from localStorage or the API
@@ -24,91 +25,133 @@ const StationList = () => {
     } else {
       axios
         .get(apiUrl)
+        // Right after fetching and setting stations data
         .then((response) => {
-          const result = JSON.parse(response.data);
-          console.log("API Data:", typeof result);
+          const result = response.data;
           if (result.status === "SCS") {
-            localStorage.setItem("stations", JSON.stringify(result.data));
-            setStations(result.data);
+            const normalizedStations = result.data.map((station) => ({
+              ...station,
+              latitude: station.LATITUDE,
+              longitude: station.LONGITUDE,
+            }));
+            localStorage.setItem(
+              "stations",
+              JSON.stringify(normalizedStations)
+            );
+            setStations(normalizedStations);
           } else {
             console.error("Failed to fetch stations:", result);
           }
         })
+
         .catch((error) => console.error("There was an error!", error));
     }
   }, []);
 
-  // useEffect(() => {
-  //   axios.get(apiUrl)
-  //     .then((response) => {
-  //       // console.log("API Data:", response.data);
-  //       if (response.data.status === "SCS") {
-  //         console.log("Hello")
-  //       }
-  //       setStations(response.data.data); // Assuming response.data.data is the correct path to your data
-  //     })
-  //     .catch((error) => console.error("There was an error!", error));
-  // }, []); // Ensure dependency array is empty
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocationCord({ longitude, latitude });
+        },
+        (error) => {
+          console.error("Error obtaining location:", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
 
-  // Create dropdown options for states and districts
-  const stateOptions = [
-    ...new Set(stations.map((station) => station.STATE)),
-  ].map((state) => ({
-    key: state,
-    text: state,
-    value: state,
-  }));
+  useEffect(() => {
+    if (
+      userLocationCord.latitude &&
+      userLocationCord.longitude &&
+      stations.length > 0
+    ) {
+      const sorted = sortStationsByProximity();
+      setSortedStations(sorted);
+    }
+  }, [userLocationCord, stations]); // Dependency array includes both userLocationCord and stations
 
-  const districtOptions = stations
-    .filter((station) => station.STATE === selectedState)
-    .map((station) => station.DISTRICT)
-    .filter((value, index, self) => self.indexOf(value) === index)
-    .map((district) => ({
-      key: district,
-      text: district,
-      value: district,
-    }));
+  const safelyParseFloat = (str) => {
+    const num = parseFloat(str);
+    return isNaN(num) ? null : num;
+  };
+  function keysToLowerCase(obj) {
+    return Object.keys(obj).reduce((accumulator, currentKey) => {
+      accumulator[currentKey.toLowerCase()] = obj[currentKey];
+      return accumulator;
+    }, {});
+  }
+  const handleBackToList = () => {
+    setSelectedStation(null);
+  };
 
+  const sortStationsByProximity = () => {
+    if (!userLocationCord || stations.length === 0) return [];
+  
+    console.log("Sorting stations with user location:", userLocationCord);
+  
+    const latitude = safelyParseFloat(userLocationCord.latitude);
+    const longitude = safelyParseFloat(userLocationCord.longitude);
+  
+    if (latitude === null || longitude === null) {
+      console.error("User location coordinates must be valid numbers", userLocationCord);
+      return [];
+    }
+  
+    const userPoint = turf.point([longitude, latitude]);
+  
+    console.log("userPoint",userPoint);
+    return stations.map((station) => {
+      const normalizedStationData = keysToLowerCase(station);
+
+      console.log("station",station);
+      const stationLatitude = safelyParseFloat(normalizedStationData.latitude);
+      const stationLongitude = safelyParseFloat(normalizedStationData.longitude);
+  
+      if (stationLongitude === null || stationLatitude === null) {
+        console.error("Station coordinates must be valid numbers", station);
+        return { ...normalizedStationData, distance: Infinity };
+      }
+  
+      const stationPoint = turf.point([stationLongitude, stationLatitude]);
+      const distance = turf.distance(userPoint, stationPoint, { units: "kilometers" });
+      return { ...normalizedStationData, distance };
+    }).sort((a, b) => a.distance - b.distance);
+  };
+
+  const handleSelectStation = (station) => {
+    console.log("station", station);
+    setSelectedStation(station);
+  };
   return (
-    <Container>
-      <Header as="h2">Stations</Header>
-      <Dropdown
-        placeholder="Select State"
-        fluid
-        selection
-        options={stateOptions}
-        value={selectedState}
-        onChange={(_, { value }) => {
-          setSelectedState(value);
-          setSelectedDistrict("");
-        }}
-        style={{ marginBottom: "20px" }}
-      />
-      <Dropdown
-        placeholder="Select District/City"
-        fluid
-        selection
-        options={districtOptions} // Use districtOptions directly
-        value={selectedDistrict}
-        onChange={(_, { value }) => setSelectedDistrict(value)}
-        disabled={!selectedState}
-        style={{ marginBottom: "20px" }}
-      />
-
-      {selectedState && selectedDistrict && (
-        <Card.Group>
-          {stations
-            .filter(
-              (station) =>
-                station.STATE === selectedState &&
-                station.DISTRICT === selectedDistrict
-            )
-            .map((station, index) => (
-              <StationCard key={index} station={station} />
-            ))}
-        </Card.Group>
-      )}
-    </Container>
+    <Container className="container">
+    <Header as="h2">Stations Near You</Header>
+    {selectedStation ? (
+      // Show map and a back button when a station is selected
+      <>
+        <Button onClick={handleBackToList}>Back to List</Button>
+        <MapComponent
+          latitude={selectedStation.latitude}
+          longitude={selectedStation.longitude}
+        />
+      </>
+    ) : (
+      // Show the list of stations when none is selected
+      <Card.Group>
+        {sortedStations.map((station, index) => (
+          <StationCard
+            key={index}
+            station={station}
+            onSelect={handleSelectStation}
+          />
+        ))}
+      </Card.Group>
+    )}
+  </Container>
   );
 };
 

@@ -159,7 +159,7 @@ const DashboardPage = () => {
         console.log("data", data);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
-        const savedUserData = localStorage.getItem("userDetails");
+        const savedUserData = localStorage.getItem("user");
         if (savedUserData) {
           const parsedData = JSON.parse(savedUserData);
           // Ensure vehicles is an array
@@ -203,8 +203,8 @@ const DashboardPage = () => {
     setUserData({ ...userData, vehicles: updatedVehicles });
     setEditVehicleData(null); // Reset edit form
 
-    // Clear userDetails from localStorage after successful vehicle add/edit
-    localStorage.removeItem("userDetails");
+    // Clear user from localStorage after successful vehicle add/edit
+    localStorage.removeItem("user");
   };
 
   const handleEditUser = () => {

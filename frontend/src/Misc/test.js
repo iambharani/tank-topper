@@ -20,7 +20,7 @@ const DashboardPage = () => {
   const API_BASE_URL = "http://localhost/tank-topper/backend/";
   const navigate = useNavigate(); 
   useEffect(() => {
-    const savedUserData = localStorage.getItem("userDetails");
+    const savedUserData = localStorage.getItem("user");
     if (savedUserData) {
       const parsedData = JSON.parse(savedUserData);
 
@@ -74,7 +74,7 @@ const DashboardPage = () => {
         console.log("result", result);
         if (result && Array.isArray(result.user.vehicles)) {
             setUserData(result.user);
-            localStorage.setItem("userDetails", JSON.stringify(result.user));
+            localStorage.setItem("user", JSON.stringify(result.user));
         } else {
             console.error("Invalid or missing vehicles data from backend");
         }
@@ -94,7 +94,7 @@ const DashboardPage = () => {
         const updatedUserData = response.data.user;
         updatedUserData.vehicles = Array.isArray(updatedUserData.vehicles) ? updatedUserData.vehicles : JSON.parse(updatedUserData.vehicles || '[]');
         setUserData(updatedUserData);
-        localStorage.setItem("userDetails", JSON.stringify(updatedUserData));
+        localStorage.setItem("user", JSON.stringify(updatedUserData));
       } else {
         console.error("Failed to fetch updated user details or user not found.");
       }
@@ -153,7 +153,7 @@ const DashboardPage = () => {
       const result = await updateUserDetails(updatedUserData);
       if (result && Array.isArray(result.vehicles)) {
         setUserData(result);
-        localStorage.setItem("userDetails", JSON.stringify(result));
+        localStorage.setItem("user", JSON.stringify(result));
       } else {
         console.error(
           "Failed to delete vehicle: Invalid response from backend"
