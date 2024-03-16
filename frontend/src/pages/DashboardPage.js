@@ -15,7 +15,8 @@ import {
 import axios from "axios";
 import dummyImage from "./../assets/profile.png";
 import "semantic-ui-css/semantic.min.css";
-import './DashboardPage.css'
+import "./DashboardPage.css";
+import Loader from "./../components/Loader";
 // import "./../App.css";
 import { useNavigate } from "react-router-dom";
 
@@ -39,11 +40,12 @@ const DashboardPage = () => {
   const [editVehicleData, setEditVehicleData] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [openEditProfileModal, setOpenEditProfileModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const API_BASE_URL = "http://localhost/tank-topper/backend/";
   const navigate = useNavigate();
   // const [showLocationPermissionModal, setShowLocationPermissionModal] =
-    useState(false);
+  useState(false);
 
   useEffect(() => {
     // setShowLocationPermissionModal(true);
@@ -128,11 +130,13 @@ const DashboardPage = () => {
     setOpenEditModal(false);
   };
   const fetchAndUpdateUserDetails = async (userId) => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `${API_BASE_URL}getUserDetails.php?id=${userId}`
       );
       if (response.data && response.data.user.id) {
+        setIsLoading(false);
         const updatedUserData = response.data.user;
         updatedUserData.vehicles = Array.isArray(updatedUserData.vehicles)
           ? updatedUserData.vehicles
@@ -142,6 +146,7 @@ const DashboardPage = () => {
       }
     } catch (error) {
       console.error("Error fetching updated user details:", error);
+      setIsLoading(false);
     }
   };
   const updateUserDetails = async (userData) => {
@@ -176,7 +181,7 @@ const DashboardPage = () => {
       console.error("Failed to update user details", error);
     }
   };
-  
+
   const openVehicleEditModal = (vehicle) => {
     setEditVehicleData(vehicle);
     setOpenEditModal(true);
@@ -216,7 +221,9 @@ const DashboardPage = () => {
     navigate("/stations");
   };
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <Segment
       padded
       style={{ minHeight: "100vh", backgroundColor: "#f4f4f4" }}
@@ -246,14 +253,13 @@ const DashboardPage = () => {
                 <Card.Meta>{userData.email}</Card.Meta>
               </Card.Content>
               <Card.Content extra>
-              <Button
-  basic
-  color="blue"
-  onClick={() => setOpenEditProfileModal(true)} // Updated to use the new state
->
-  Edit Profile
-</Button>
-
+                <Button
+                  basic
+                  color="blue"
+                  onClick={() => setOpenEditProfileModal(true)} // Updated to use the new state
+                >
+                  Edit Profile
+                </Button>
               </Card.Content>
             </Card>
             <Header
@@ -361,11 +367,10 @@ const DashboardPage = () => {
       </Modal>
 
       <Modal
-  open={openEditProfileModal} // Updated to use the new state
-  onClose={() => setOpenEditProfileModal(false)} // Updated to use the new state
-  size="tiny"
->
-
+        open={openEditProfileModal} // Updated to use the new state
+        onClose={() => setOpenEditProfileModal(false)} // Updated to use the new state
+        size="tiny"
+      >
         <Modal.Header>Edit Profile</Modal.Header>
         <Modal.Content>
           <Form>
@@ -416,10 +421,7 @@ const DashboardPage = () => {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button
-            color="black"
-            onClick={() => setOpenEditProfileModal(false)}
-          >
+          <Button color="black" onClick={() => setOpenEditProfileModal(false)}>
             Cancel
           </Button>
           <Button

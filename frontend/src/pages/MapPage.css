@@ -1,0 +1,7 @@
+.buttonContainer {
+    position: absolute;
+    bottom: 20px; /* Adjust based on desired location */
+    right: 20px; /* Adjust based on desired location */
+    z-index: 1000; /* Make sure this is higher than the map's z-index */
+  }
+  

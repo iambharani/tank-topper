@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Header, Card, Button } from "semantic-ui-react";
+import { Container, Header, Card, Grid, Loader } from "semantic-ui-react"; // Import Loader from semantic-ui-react
 import StationCard from "../components/StationCard"; // Adjust the path as necessary
 import * as turf from "@turf/turf";
-import MapComponent from "../components/MapComponent";
+import { useNavigate } from 'react-router-dom';
 
 const StationList = () => {
   const [stations, setStations] = useState([]);
@@ -17,16 +17,20 @@ const StationList = () => {
   const apiUrl = "http://localhost/tank-topper/backend/getStations.php";
   // Replace 'YOUR_OPENCAGE_API_KEY' with your actual OpenCage API key.
   const reverseGeocodingUrl = `https://api.opencagedata.com/geocode/v1/json?key=82a7ceb08abf48009f857023ebf4bdac`;
+  const navigate = useNavigate(); // At the beginning of your StationList component
+  const [isLoading, setIsLoading] = useState(true); // New state for tracking loading status
 
   useEffect(() => {
-    // Attempt to fetch stations either from localStorage or the API
+    setIsLoading(true); // Set loading to true when starting to fetch
     const storedStations = localStorage.getItem("stations");
     if (storedStations) {
-      setStations(JSON.parse(storedStations));
+      // Simulate a delay with setTimeout
+      setTimeout(() => {
+        setStations(JSON.parse(storedStations));
+        setIsLoading(false); // Set loading to false after the delay
+      }, 2000); // Delay in milliseconds, e.g., 2000ms = 2 seconds
     } else {
-      axios
-        .get(apiUrl)
-        // Right after fetching and setting stations data
+      axios.get("http://localhost/tank-topper/backend/getStations.php")
         .then((response) => {
           const result = response.data;
           if (result.status === "SCS") {
@@ -35,19 +39,17 @@ const StationList = () => {
               latitude: station.LATITUDE,
               longitude: station.LONGITUDE,
             }));
-            localStorage.setItem(
-              "stations",
-              JSON.stringify(normalizedStations)
-            );
+            localStorage.setItem("stations", JSON.stringify(normalizedStations));
             setStations(normalizedStations);
           } else {
             console.error("Failed to fetch stations:", result);
           }
         })
-
-        .catch((error) => console.error("There was an error!", error));
+        .catch((error) => console.error("There was an error!", error))
+        .finally(() => setIsLoading(false)); // Ensure loading is set to false when fetch is complete
     }
   }, []);
+
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -83,9 +85,6 @@ const StationList = () => {
       return accumulator;
     }, {});
   }
-  const handleBackToList = () => {
-    setSelectedStation(null);
-  };
 
   const sortStationsByProximity = () => {
     if (!userLocationCord || stations.length === 0) return [];
@@ -121,35 +120,44 @@ const StationList = () => {
     }).sort((a, b) => a.distance - b.distance);
   };
 
+  // const handleSelectStation = (station) => {
+  //   console.log("station", station);
+  //   setSelectedStation(station);
+  // };
+
   const handleSelectStation = (station) => {
     console.log("station", station);
-    setSelectedStation(station);
+    navigate('/map', {
+      state: {
+        selectedStation: station,
+        userLocationCord: userLocationCord,
+      }
+    });
   };
+
   const renderStationList = () => {
     const stationsToDisplay = selectedStation ? [selectedStation] : sortedStations;
     return stationsToDisplay.map((station, index) => (
       <StationCard key={index} station={station} onSelect={handleSelectStation} />
     ));
   };
-  return (
-    <Container className="container">
-    <Header as="h2">Stations Near You</Header>
-    {selectedStation ? (
-      <>
-        <MapComponent
-          latitude={selectedStation.latitude}
-          longitude={selectedStation.longitude}
-          userLatitude={userLocationCord.latitude}
-          userLongitude={userLocationCord.longitude}
-          isFullScreen={true} // You might need to adjust your MapComponent to use this prop
-        />
-                <Button onClick={() => setSelectedStation(null)}>Back to List</Button>
+  if (isLoading) {
+    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Loader active inline='centered' inverted>Loading Stations...</Loader>
+  </div>;
+  }
 
-      </>
-    ) : (
-      <Card.Group>{renderStationList()}</Card.Group>
-    )}
-  </Container>
+  return (
+    <Container className="stationsPageContainer" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Grid textAlign="center" style={{ width: '100%' }} verticalAlign="middle">
+        <Grid.Column style={{ maxWidth: 800 }}>
+          <Header as="h2" color="black" textAlign="center">
+            Stations Near You
+          </Header>
+          <Card.Group centered>{renderStationList()}</Card.Group>
+        </Grid.Column>
+      </Grid>
+    </Container>
   );
 };
 

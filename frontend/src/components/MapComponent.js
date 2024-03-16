@@ -15,7 +15,7 @@ const MapComponent = ({
   const mapContainerRef = useRef(null); // Assuming you have a ref for the map container
   const containerStyle = {
     width: "100%",
-    height: isFullScreen ? "90vh" : "400px", // Full screen height or fixed height
+    height: isFullScreen ? "100vh" : "400px", // Full screen height or fixed height
     position: isFullScreen ? "fixed" : "relative", // Make position fixed to cover the full screen
     top: 0,
     left: 0,
@@ -111,7 +111,6 @@ const MapComponent = ({
     <div id="map" ref={mapContainerRef} style={containerStyle}>
       {/* Map will be attached to this div */}
     </div>
-    
   );
 };
 

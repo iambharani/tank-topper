@@ -1,24 +1,21 @@
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import {thunk} from 'redux-thunk'; // Corrected import statement for thunk
-import authReducer from "./../reducers/authReducer"; // Ensure the path is correct
-import { composeWithDevTools } from '@redux-devtools/extension';
+import { configureStore } from '@reduxjs/toolkit';
+import {thunk} from 'redux-thunk'; // Corrected import
+import authReducer from "../reducers/authReducer";
+import stationReducer from '../reducers/stationReducer';
+import locationReducer from '../reducers/locationReducer';
 
-// Assuming loginUserSuccess is correctly placed elsewhere (e.g., in your actions file)
-
-const rootReducer = combineReducers({
+const rootReducer = {
   auth: authReducer,
-});
+  station: stationReducer,
+  location: locationReducer
+};
 
-// Example initialization of Redux store state from local storage
 const persistedState = localStorage.getItem('user') ? { auth: { user: JSON.parse(localStorage.getItem('user')) } } : {};
 
-// Create the store with the persisted state
-const store = createStore(
-  rootReducer,
-  persistedState,
-  composeWithDevTools(
-    applyMiddleware(thunk)
-  )
-);
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+  preloadedState: persistedState,
+});
 
 export default store;
