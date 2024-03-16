@@ -2,8 +2,8 @@
 include 'db.php';
 
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
 
 $userData = json_decode(file_get_contents('php://input'), true);
@@ -11,29 +11,50 @@ $userData = json_decode(file_get_contents('php://input'), true);
 $userId = $userData['id'] ?? null;
 $username = $userData['username'] ?? '';
 $email = $userData['email'] ?? '';
-$userImage = $userData['userImage'] ?? '';
 $vehicles = is_array($userData['vehicles']) ? $userData['vehicles'] : [];
-$isActive = $userData['isActive'] ?? false; // Assume `isActive` is included in the request
+$isActive = $userData['isActive'] ?? false;
 $vehiclesJson = json_encode($vehicles);
+$userImage = ''; // Initialize as empty, to be updated if a new image is uploaded
+
+// Process image upload if present
+if (isset($_FILES['userImage'])) {
+    $target_dir = "uploads/";
+    $target_file = $target_dir . basename($_FILES["userImage"]["name"]);
+
+    // Add any desired file validation here (e.g., file size, type)
+
+    if (move_uploaded_file($_FILES["userImage"]["tmp_name"], $target_file)) {
+        // On successful upload, update userImage variable to the path of the uploaded file
+        $userImage = $target_file;
+    } else {
+        echo json_encode(["error" => "Error uploading file."]);
+        exit;
+    }
+} else {
+    // If no image is uploaded, retain the existing image path from the request
+    $userImage = $userData['userImage'] ?? '';
+}
 
 if ($userId === null) {
     echo json_encode(["error" => "User ID is missing from the request"]);
     exit;
 }
 
+// Prepare SQL statement for updating user details
 $sql = "UPDATE users SET username=?, email=?, userImage=?, vehicles=?, isActive=? WHERE id=?";
 
 if ($stmt = $conn->prepare($sql)) {
-    // Notice the addition of "i" at the end of the type specifier string for binding the `isActive` value as an integer
+    // Cast isActive to integer
+    $isActive = $isActive ? 1 : 0;
     $stmt->bind_param("ssssii", $username, $email, $userImage, $vehiclesJson, $isActive, $userId);
 
     if ($stmt->execute()) {
         $affectedRows = $stmt->affected_rows;
-        $stmt->close(); // Close the statement as soon as you're done with it
+        $stmt->close();
 
+        // If the update was successful, fetch the updated user details
         if ($affectedRows > 0) {
-            // Fetch updated user details, including isActive status
-            $fetchSql = "SELECT id, username, email, userImage, vehicles, isActive FROM users WHERE id = ?";
+            $fetchSql = "SELECT id, username, email, userImage, vehicles, isActive FROM users WHERE id=?";
             if ($fetchStmt = $conn->prepare($fetchSql)) {
                 $fetchStmt->bind_param("i", $userId);
                 $fetchStmt->execute();

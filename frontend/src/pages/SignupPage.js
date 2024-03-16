@@ -10,38 +10,38 @@ const SignupComponent = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [latitude, setLatitude] = useState(0);
-const [longitude, setLongitude] = useState(0);
-const [hasLocationPermission, setHasLocationPermission] = useState(false);
-
-  const [locationAccess, setLocationAccess] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [latitude, setLatitude] = useState(null);
+const [longitude, setLongitude] = useState(null);
+  const [hasLocationPermission, setHasLocationPermission] = useState(false);
+  const [modalOpen, setModalOpen] = useState(true); // Start with modal open to ask for permission
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setModalOpen(true);
-    requestLocation();
+    // Directly requesting location permission on mount may lead to the modal closing immediately if permission is set
+    // Consider using a button or another interaction to trigger `requestLocation`, or handle the modal logic based on permission state.
   }, []);
 
   const requestLocation = () => {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setHasLocationPermission(true);
-                setModalOpen(false);
-            },
-            (error) => {
-                console.error("Error Code = " + error.code + " - " + error.message);
-                setHasLocationPermission(false);
-                setModalOpen(true);
-            }
-        );
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+          setHasLocationPermission(true);
+          setModalOpen(false); // Close modal on permission grant
+        },
+        (error) => {
+          console.error("Error Code = " + error.code + " - " + error.message);
+          setHasLocationPermission(false);
+          setModalOpen(true); // Keep or reopen modal on permission deny
+        }
+      );
     } else {
-        alert("Geolocation is not supported by this browser.");
+      alert("Geolocation is not supported by this browser.");
+      // Consider how to handle this case in your app, possibly maintaining the modal open with a message or providing an alternative way to use the app.
     }
-};
-
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,10 +49,11 @@ const [hasLocationPermission, setHasLocationPermission] = useState(false);
       username,
       email,
       password,
-      hasLocationPermission, // Updated to send permission flag
-  };
-  
-    
+      hasLocationPermission,
+      latitude,
+      longitude,
+      isActive
+    };
 
     try {
       const response = await axios.post(
@@ -64,7 +65,7 @@ const [hasLocationPermission, setHasLocationPermission] = useState(false);
       );
 
       if (response.data.success) {
-        console.log("afterSignup",response.data)
+        console.log("afterSignup", response.data);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         dispatch(setCurrentUser(userData));
         navigate("/dashboard");
@@ -73,10 +74,7 @@ const [hasLocationPermission, setHasLocationPermission] = useState(false);
       }
     } catch (error) {
       console.error("Signup error:", error);
-      alert(
-        "Signup failed: " +
-          (error.response?.data?.message || "An error occurred.")
-      );
+      alert("Signup failed: " + (error.response?.data?.message || "An error occurred."));
     }
   };
 
@@ -101,7 +99,7 @@ const [hasLocationPermission, setHasLocationPermission] = useState(false);
           </Button>
         </Modal.Actions>
       </Modal>
-      {locationAccess && (
+      {hasLocationPermission && ( // This should check for hasLocationPermission instead of locationAccess
         <Grid
           textAlign="center"
           style={{ height: "100vh" }}

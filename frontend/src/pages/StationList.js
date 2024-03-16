@@ -15,8 +15,6 @@ const StationList = () => {
   const [selectedStation, setSelectedStation] = useState(null);
 
   const apiUrl = "http://localhost/tank-topper/backend/getStations.php";
-  // Replace 'YOUR_OPENCAGE_API_KEY' with your actual OpenCage API key.
-  const reverseGeocodingUrl = `https://api.opencagedata.com/geocode/v1/json?key=82a7ceb08abf48009f857023ebf4bdac`;
   const navigate = useNavigate(); // At the beginning of your StationList component
   const [isLoading, setIsLoading] = useState(true); // New state for tracking loading status
 
@@ -32,7 +30,7 @@ const StationList = () => {
     } else {
       axios.get("http://localhost/tank-topper/backend/getStations.php")
         .then((response) => {
-          const result = response.data;
+          const result = JSON.parse(response.data);
           if (result.status === "SCS") {
             const normalizedStations = result.data.map((station) => ({
               ...station,
@@ -119,11 +117,6 @@ const StationList = () => {
       return { ...normalizedStationData, distance };
     }).sort((a, b) => a.distance - b.distance);
   };
-
-  // const handleSelectStation = (station) => {
-  //   console.log("station", station);
-  //   setSelectedStation(station);
-  // };
 
   const handleSelectStation = (station) => {
     console.log("station", station);

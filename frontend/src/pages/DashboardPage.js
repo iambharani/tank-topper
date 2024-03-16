@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import {  Card,  Grid,  Image,  Segment,  Header,  Button,} from "semantic-ui-react";
+import { Card, Grid, Image, Segment, Header, Button } from "semantic-ui-react";
 import axios from "axios";
-import dummyImage from "./../assets/profile.png";
+// import dummyImage from "./../assets/profile.png";
 import "semantic-ui-css/semantic.min.css";
 import "./../css/DashboardPage.css";
 import Loader from "./../components/Loader";
 import { useNavigate } from "react-router-dom";
-import EditProfileModal from './../components/EditProfileModal'
-import EditVehicleModal from './../components/EditVehicleModal'
+import EditProfileModal from "./../components/EditProfileModal";
+import EditVehicleModal from "./../components/EditVehicleModal";
+const dummyImage = `https://avatar.iran.liara.run/public/29`; // Using the CDN link for the dummy image
+
 const initialUserData = {
   username: "",
   email: "",
@@ -45,6 +47,7 @@ const DashboardPage = () => {
         ? parsedData.vehicles
         : [];
       parsedData.userImage = parsedData.userImage || dummyImage;
+      console.log(parsedData);
       setUserData(parsedData);
     }
   }, []);
@@ -261,16 +264,11 @@ const DashboardPage = () => {
                 circular
                 spaced
                 verticalAlign="middle"
-                style={{
-                  marginTop: "10px",
-                  marginBottom: "10px",
-                  borderRadius: "5px",
-                }}
-                centered
-                src={userData.userImage}
+                src={userData && userData.userImage ? userData.userImage : dummyImage}
                 size="small"
-                className="customCircularImage"
+                className="customCircularImage customImageStyle"
               />
+
               <Card.Content className="profile-card-content">
                 <Card.Header className="profile-card-header">
                   {userData.username}
@@ -307,46 +305,48 @@ const DashboardPage = () => {
                     id: null,
                   })
                 }
-                style={{
-                  backgroundColor: "#21ba45",
-                  color: "white",
-                  boxShadow: "0px 2px 4px 0px rgba(34, 36, 38, 0.12)",
-                  marginTop: "5px",
-                  marginRight: "5px",
-                  marginLeft: "5px",
-                  marginBottom: "5px",
-                  padding: "10px",
-                }}
+                className="addButton"
               >
                 Add
               </Button>
             </Header>
             {userData.vehicles.length > 0 ? (
-              <Grid columns={3} divided>
-                {userData.vehicles.map((vehicle) => (
-                  <Grid.Column key={vehicle.id}>
-                    <Segment className="segment-card">
-                      <div className="segment-content">
-                        <div>
-                          <Header as="h4">{vehicle.vehicleNumber}</Header>
-                          <p>{vehicle.fuelType}</p>
-                        </div>
-                        <div className="segment-action-buttons">
-                          <Button
-                            icon="edit"
-                            onClick={() => openVehicleEditModal(vehicle)}
-                          />
-                          <Button
-                            icon="trash"
-                            color="red"
-                            onClick={() => handleDeleteVehicle(vehicle.id)}
-                          />
-                        </div>
-                      </div>
-                    </Segment>
-                  </Grid.Column>
-                ))}
-              </Grid>
+            <Grid columns={3} divided>
+            {userData.vehicles.map((vehicle) => (
+             <Grid.Column key={vehicle.id}>
+             <Segment className="segment-card">
+               <div className="segment-content">
+                 <div className="vehicle-info">
+                   <Header as="h4">{vehicle.vehicleNumber}</Header>
+                   <p>{vehicle.fuelType}</p>
+                 </div>
+                 <div className="segment-action-buttons">
+                   <div className="edit-delete-buttons">
+                     <Button
+                       icon="edit"
+                       onClick={() => openVehicleEditModal(vehicle)}
+                     />
+                     <Button
+                       icon="trash"
+                       color="red"
+                       onClick={() => handleDeleteVehicle(vehicle.id)}
+                     />
+                   </div>
+                   {/* "Fuel Now" button as a separate action */}
+                   <Button
+                     primary
+                     className="fuel-now-button"
+                     onClick={() => handleFuelNowClick(vehicle.fuelType)}
+                   >
+                     Fuel Now
+                   </Button>
+                 </div>
+               </div>
+             </Segment>
+           </Grid.Column>
+           
+            ))}
+          </Grid>
             ) : (
               <p>No vehicles added yet.</p>
             )}
@@ -355,34 +355,22 @@ const DashboardPage = () => {
         {/* Modal components here */}
       </Grid>
       <EditVehicleModal
-  openEditModal={openEditModal}
-  setOpenEditModal={setOpenEditModal}
-  editVehicleData={editVehicleData}
-  handleFormChange={handleFormChange}
-  handleSaveVehicle={handleSaveVehicle}
-  fuelTypeOptions={fuelTypeOptions}
-/>
+        openEditModal={openEditModal}
+        setOpenEditModal={setOpenEditModal}
+        editVehicleData={editVehicleData}
+        handleFormChange={handleFormChange}
+        handleSaveVehicle={handleSaveVehicle}
+        fuelTypeOptions={fuelTypeOptions}
+      />
 
-<EditProfileModal
-  openEditProfileModal={openEditProfileModal}
-  setOpenEditProfileModal={setOpenEditProfileModal}
-  userData={userData}
-  handleFileChange={handleFileChange}
-  handleUserFormChange={handleUserFormChange}
-  handleEditUser={handleEditUser}
-/>
-
-
-      {userData && userData.isActive && (
-        <Button
-        centered
-          primary
-          onClick={handleFuelNowClick}
-          style={{ marginTop: "20px" }}
-        >
-          Fuel Now
-        </Button>
-      )}
+      <EditProfileModal
+        openEditProfileModal={openEditProfileModal}
+        setOpenEditProfileModal={setOpenEditProfileModal}
+        userData={userData}
+        handleFileChange={handleFileChange}
+        handleUserFormChange={handleUserFormChange}
+        handleEditUser={handleEditUser}
+      />
     </div>
   );
 };

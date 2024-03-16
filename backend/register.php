@@ -13,8 +13,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($data)) {
     $username = filter_var($data['username'], FILTER_SANITIZE_STRING);
     $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
     $password = $data['password'];
-    // $latitude = filter_var($data['location']['latitude'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-    // $longitude = filter_var($data['location']['longitude'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $latitude = filter_var($data['location']['latitude'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $longitude = filter_var($data['location']['longitude'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $hasLocationPermission = filter_var($data['hasLocationPermission'], FILTER_VALIDATE_BOOLEAN);
 
     if (!$email) {
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($data)) {
 
     // Assuming default or fetched values for userImage and vehicles
     $isActive = 0; // Since you are setting isActive directly in your query
-    $userImage = 'default_image.jpg'; // Example default or fetched value
+    $userImage = ''; // Example default or fetched value
     $vehicles = []; // Assuming an empty array for demonstration, or fetch actual data
 
     $stmt = $conn->prepare("INSERT INTO users (username, email, password, isActive, location_permission) VALUES (?, ?, ?, ?, ?)");

@@ -18,6 +18,7 @@ function App() {
   const userFromLocalStorage = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
   const currentUser = user || userFromLocalStorage;
+  console.log(currentUser);
 
   return (
     <div className="App">
