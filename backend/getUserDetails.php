@@ -23,16 +23,12 @@ if ($_SERVER["REQUEST_METHOD"] === "GET" && $user_id !== null) {
             $result = $stmt->get_result();
             if ($result->num_rows === 1) {
                 $user = $result->fetch_assoc();
-                
-                // Assuming 'vehicles' is stored as a JSON string in your database
-                // $user['vehicles'] = json_decode($user['vehicles'], true);
 
-                // Correct response format for fetched user details
                 $response = [
                     "message" => "User details fetched successfully.",
                     "user" => $user
                 ];
-                echo json_encode($response); // Send JSON response
+                echo json_encode($response);
             } else {
                 echo json_encode(['error' => "User not found."]);
             }

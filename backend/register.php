@@ -24,10 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($data)) {
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Assuming default or fetched values for userImage and vehicles
-    $isActive = 0; // Since you are setting isActive directly in your query
-    $userImage = ''; // Example default or fetched value
-    $vehicles = []; // Assuming an empty array for demonstration, or fetch actual data
+    $isActive = 0; 
+    $userImage = ''; 
+    $vehicles = []; 
 
     $stmt = $conn->prepare("INSERT INTO users (username, email, password, isActive, location_permission) VALUES (?, ?, ?, ?, ?)");
     if (!$stmt) {
@@ -36,12 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($data)) {
     }
     
     $stmt->bind_param("sssdi", $username, $email, $hashedPassword, $isActive, $hasLocationPermission);
-     
 
     if ($stmt->execute()) {
-        $userId = $stmt->insert_id; // Get the auto-generated user ID
-
-        // You might want to fetch $userImage and $vehicles from the database if they are not static/default
+        $userId = $stmt->insert_id;
 
         echo json_encode([
             'success' => true, 

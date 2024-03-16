@@ -99,7 +99,7 @@ const [longitude, setLongitude] = useState(null);
           </Button>
         </Modal.Actions>
       </Modal>
-      {hasLocationPermission && ( // This should check for hasLocationPermission instead of locationAccess
+      {hasLocationPermission && ( 
         <Grid
           textAlign="center"
           style={{ height: "100vh" }}

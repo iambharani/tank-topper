@@ -12,7 +12,6 @@ const HeaderComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Use useSelector to get the logged-in status from Redux store
   const isLoggedIn = useSelector((state) => !!state.auth.user);
 
   const handleLogout = () => {

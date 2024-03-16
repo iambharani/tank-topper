@@ -1,11 +1,10 @@
-import React, { useState  } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-
 import { Button, Form, Grid, Header, Segment } from 'semantic-ui-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './../css/LoginPage.css';
-import { setCurrentUser } from './../actions/authActions'; // Update this path
+import { setCurrentUser } from './../actions/authActions';
 
 const LoginComponent = () => {
   const [email, setEmail] = useState('');
@@ -25,27 +24,20 @@ const LoginComponent = () => {
       console.log("response", response.data);
 
       if (response.data.success) {
-        // Assuming user includes the isActive flag
         const { user } = response.data;
         dispatch(setCurrentUser(user));
-
-        // Store user in localStorage
         localStorage.setItem('user', JSON.stringify(user));
         alert(response.data.message);
 
-        // Redirect based on the isActive flag and presence of vehicles
         if (!user.isActive) {
-          // If isActive is false, redirect to dashboard to add a vehicle
           navigate('/dashboard');
         } else if (user.vehicles && user.vehicles.length > 0) {
-          // If isActive is true and there are vehicles, redirect to stations
           navigate('/stations');
         } else {
-          // Default redirection if no other condition is met
           navigate('/dashboard');
         }
       } else {
-        alert(response.data.message); // Display error message from response
+        alert(response.data.message);
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -18,10 +18,10 @@ const initialUserData = {
 };
 
 const fuelTypeOptions = [
-  { key: "diesel", text: "Diesel", value: "diesel" },
-  { key: "petrol", text: "Petrol", value: "petrol" },
+  // // { key: "diesel", text: "Diesel", value: "diesel" },
+  // { key: "petrol", text: "Petrol", value: "petrol" },
   { key: "cng", text: "CNG", value: "cng" },
-  { key: "cng+petrol", text: "CNG + Petrol", value: "cng+petrol" },
+  // { key: "cng+petrol", text: "CNG + Petrol", value: "cng+petrol" },
 ];
 
 const DashboardPage = () => {

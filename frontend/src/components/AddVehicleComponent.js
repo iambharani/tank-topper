@@ -10,7 +10,7 @@ const Dashboard = () => {
         username: '',
         email: '',
         vehicles: [],
-        userImage: '', // Assuming you're storing the image URL
+        userImage: '',
     });
     const [editMode, setEditMode] = useState(false);
 
@@ -29,7 +29,6 @@ const Dashboard = () => {
 
     const handleVehicleAdded = () => {
         setShowAddVehicle(false);
-        // Optionally, refresh the user's vehicles list
     };
 
     const handleUpdateUserDetails = async (e) => {
@@ -37,7 +36,6 @@ const Dashboard = () => {
         try {
             await axios.post("http://localhost/api/user/update", userData);
             setEditMode(false);
-            // Optionally, refresh user data here
         } catch (error) {
             console.error("Error updating user details:", error);
         }
@@ -67,7 +65,6 @@ const Dashboard = () => {
                                     onChange={e => setUserData({ ...userData, email: e.target.value })}
                                 />
                             </Form.Field>
-                            {/* Implement image upload functionality here */}
                             <Button type="submit" positive>Save Changes</Button>
                         </Form>
                     ) : (
@@ -94,7 +91,6 @@ const Dashboard = () => {
                     {userData.vehicles.map(vehicle => (
                         <Segment key={vehicle.id}>
                             <p>{vehicle.vehicleName}</p>
-                            {/* Add functionality to edit vehicle details */}
                         </Segment>
                     ))}
                 </Grid.Column>

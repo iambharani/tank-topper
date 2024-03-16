@@ -2,14 +2,13 @@ import React from 'react';
 import { Card, Icon } from 'semantic-ui-react';
 
 const VehicleDetail = ({ vehicle }) => {
-  // Define a function or a map to convert fuel type keys to user-friendly strings if necessary
   const getFuelTypeDisplayName = (fuelType) => {
     const fuelTypeMap = {
-      electric: 'Electric',
-      diesel: 'Diesel',
-      petrol: 'Petrol',
+      // electric: 'Electric',
+      // diesel: 'Diesel',
+      // petrol: 'Petrol',
       cng: 'CNG',
-      cng_with_petrol: 'CNG with Petrol'
+      // cng_with_petrol: 'CNG with Petrol'
     };
     return fuelTypeMap[fuelType] || 'Unknown';
   };

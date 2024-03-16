@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Header, Card, Grid, Loader } from "semantic-ui-react"; // Import Loader from semantic-ui-react
-import StationCard from "../components/StationCard"; // Adjust the path as necessary
+import { Container, Header, Card, Grid, Loader } from "semantic-ui-react"; 
+import StationCard from "../components/StationCard";
 import * as turf from "@turf/turf";
 import { useNavigate } from 'react-router-dom';
 
@@ -15,17 +15,17 @@ const StationList = () => {
   const [selectedStation, setSelectedStation] = useState(null);
 
   const apiUrl = "http://localhost/tank-topper/backend/getStations.php";
-  const navigate = useNavigate(); // At the beginning of your StationList component
-  const [isLoading, setIsLoading] = useState(true); // New state for tracking loading status
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true); 
 
   useEffect(() => {
-    setIsLoading(true); // Set loading to true when starting to fetch
+    setIsLoading(true); 
     const storedStations = localStorage.getItem("stations");
     if (storedStations) {
       // Simulate a delay with setTimeout
       setTimeout(() => {
         setStations(JSON.parse(storedStations));
-        setIsLoading(false); // Set loading to false after the delay
+        setIsLoading(false); 
       }, 2000); // Delay in milliseconds, e.g., 2000ms = 2 seconds
     } else {
       axios.get("http://localhost/tank-topper/backend/getStations.php")
@@ -44,7 +44,7 @@ const StationList = () => {
           }
         })
         .catch((error) => console.error("There was an error!", error))
-        .finally(() => setIsLoading(false)); // Ensure loading is set to false when fetch is complete
+        .finally(() => setIsLoading(false)); 
     }
   }, []);
 

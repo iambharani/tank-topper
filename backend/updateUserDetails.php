@@ -14,24 +14,18 @@ $email = $userData['email'] ?? '';
 $vehicles = is_array($userData['vehicles']) ? $userData['vehicles'] : [];
 $isActive = $userData['isActive'] ?? false;
 $vehiclesJson = json_encode($vehicles);
-$userImage = ''; // Initialize as empty, to be updated if a new image is uploaded
+$userImage = '';
 
-// Process image upload if present
 if (isset($_FILES['userImage'])) {
     $target_dir = "uploads/";
     $target_file = $target_dir . basename($_FILES["userImage"]["name"]);
-
-    // Add any desired file validation here (e.g., file size, type)
-
     if (move_uploaded_file($_FILES["userImage"]["tmp_name"], $target_file)) {
-        // On successful upload, update userImage variable to the path of the uploaded file
         $userImage = $target_file;
     } else {
         echo json_encode(["error" => "Error uploading file."]);
         exit;
     }
 } else {
-    // If no image is uploaded, retain the existing image path from the request
     $userImage = $userData['userImage'] ?? '';
 }
 
@@ -40,19 +34,15 @@ if ($userId === null) {
     exit;
 }
 
-// Prepare SQL statement for updating user details
 $sql = "UPDATE users SET username=?, email=?, userImage=?, vehicles=?, isActive=? WHERE id=?";
 
 if ($stmt = $conn->prepare($sql)) {
-    // Cast isActive to integer
     $isActive = $isActive ? 1 : 0;
     $stmt->bind_param("ssssii", $username, $email, $userImage, $vehiclesJson, $isActive, $userId);
 
     if ($stmt->execute()) {
         $affectedRows = $stmt->affected_rows;
         $stmt->close();
-
-        // If the update was successful, fetch the updated user details
         if ($affectedRows > 0) {
             $fetchSql = "SELECT id, username, email, userImage, vehicles, isActive FROM users WHERE id=?";
             if ($fetchStmt = $conn->prepare($fetchSql)) {

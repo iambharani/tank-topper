@@ -12,11 +12,11 @@ const MapComponent = ({
 }) => {
   console.log(latitude, longitude, isFullScreen, userLatitude, userLongitude);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const mapContainerRef = useRef(null); // Assuming you have a ref for the map container
+  const mapContainerRef = useRef(null); 
   const containerStyle = {
     width: "100%",
-    height: isFullScreen ? "100vh" : "400px", // Full screen height or fixed height
-    position: isFullScreen ? "fixed" : "relative", // Make position fixed to cover the full screen
+    height: isFullScreen ? "100vh" : "400px",
+    position: isFullScreen ? "fixed" : "relative",
     top: 0,
     left: 0,
     zIndex: isFullScreen ? 1000 : 1, // Ensure it's above other content
@@ -29,18 +29,21 @@ const MapComponent = ({
         const response = await axios.post(
           "http://localhost/tank-topper/backend/token_generator.php"
         );
-        const cleanResponseData = response.data.replace(
-          /^\/\/ token_generator\.php\r\n/,
-          ""
-        );
-        const result = JSON.parse(cleanResponseData);
+
+        console.log( response.data);
+        // const cleanResponseData = response.data.replace(
+        //   /^\/\/ token_generator\.php\r\n/,
+        //   ""
+        // );
+        // const result = JSON.parse(cleanResponseData);
+        // const result = JSON.parse(response.data);
+        const result = response.data;
         console.log("Parsed Response Data:", result);
 
-        // Manually parse the JSON string into an object
-        console.log("Access Token:", result.access_token); // This should log the actual access token
+        console.log("Access Token:", result.access_token); 
 
         if (result.access_token) {
-          initializeMap(result.access_token); // Initialize the map with the access token
+          initializeMap(result.access_token);
         } else {
           console.error(
             "Access token is undefined. Check the response structure and parsing."
@@ -101,11 +104,8 @@ const MapComponent = ({
 
     fetchAccessToken();
 
-    // Cleanup function to reset map loaded state if necessary
-    return () => {
-      // Implement any necessary cleanup
-    };
-  }, [latitude, longitude, isMapLoaded, userLatitude, userLongitude]); // Ensure dependencies are correctly listed
+
+  }, [latitude, longitude, isMapLoaded, userLatitude, userLongitude]); 
 
   return (
     <div id="map" ref={mapContainerRef} style={containerStyle}>
