@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../actions/authActions";
 import { Button, Form, Grid, Header, Segment, Modal } from "semantic-ui-react";
 import { Link, useNavigate } from "react-router-dom";
-import "./LoginPage.css";
+import "./../css/LoginPage.css";
 
 const SignupComponent = () => {
   const [username, setUsername] = useState("");

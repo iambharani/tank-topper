@@ -1,4 +1,4 @@
-/* Add this to your main.stationcard-css or equivalent stylesheet file */
+@import url(./variables.css);
 .stationcard-card {
     cursor: pointer;
     border-radius: 8px;

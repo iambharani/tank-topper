@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Header, Button } from 'semantic-ui-react';
-
+import './../css/HeroSection.css'
 const HeroSection = () => (
   <div className="hero-section">
     <Container text className="hero-content" >

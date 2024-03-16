@@ -1,25 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  Grid,
-  Image,
-  Segment,
-  Header,
-  Button,
-  Icon,
-  Modal,
-  Form,
-  Dropdown,
-} from "semantic-ui-react";
-
+import {  Card,  Grid,  Image,  Segment,  Header,  Button,} from "semantic-ui-react";
 import axios from "axios";
 import dummyImage from "./../assets/profile.png";
 import "semantic-ui-css/semantic.min.css";
-import "./DashboardPage.css";
+import "./../css/DashboardPage.css";
 import Loader from "./../components/Loader";
-// import "./../App.css";
 import { useNavigate } from "react-router-dom";
-
+import EditProfileModal from './../components/EditProfileModal'
+import EditVehicleModal from './../components/EditVehicleModal'
 const initialUserData = {
   username: "",
   email: "",
@@ -44,12 +32,9 @@ const DashboardPage = () => {
 
   const API_BASE_URL = "http://localhost/tank-topper/backend/";
   const navigate = useNavigate();
-  // const [showLocationPermissionModal, setShowLocationPermissionModal] =
   useState(false);
 
   useEffect(() => {
-    // setShowLocationPermissionModal(true);
-
     const savedUserData = localStorage.getItem("user");
     if (savedUserData) {
       const parsedData = JSON.parse(savedUserData);
@@ -85,8 +70,6 @@ const DashboardPage = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-
-          // Geocoding logic here (as previously described)
         },
         (error) => {
           console.error("Error getting geolocation:", error);
@@ -129,6 +112,45 @@ const DashboardPage = () => {
     setEditVehicleData(null);
     setOpenEditModal(false);
   };
+
+  const handleSaveProfile = async () => {
+    setIsLoading(true); // Assuming you have a state to manage loading state
+
+    const formData = new FormData();
+    formData.append("id", userData.id);
+    formData.append("username", userData.username);
+    formData.append("email", userData.email);
+    // Append the image file if selected
+    if (selectedFile) {
+      formData.append("userImage", selectedFile);
+    }
+    // Append other user details as needed
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}updateUserDetails.php`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data && response.data.user) {
+        // Assuming the response will include updated user data
+        setUserData(response.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        // Handle success
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error updating user details:", error);
+      setIsLoading(false);
+      // Handle error
+    }
+  };
+
   const fetchAndUpdateUserDetails = async (userId) => {
     setIsLoading(true);
     try {
@@ -224,15 +246,16 @@ const DashboardPage = () => {
   return isLoading ? (
     <Loader />
   ) : (
-    <Segment
-      padded
-      style={{ minHeight: "100vh", backgroundColor: "#f4f4f4" }}
-      textAlign="center"
-    >
-      <Grid container stackable style={{ justifyContent: "center" }}>
+    <div className="centeredContent">
+      <Grid
+        container
+        stackable
+        className="centeredContent"
+        style={{ maxWidth: "900px" }}
+      >
         <Grid.Row>
           <Grid.Column width={16}>
-            <Card centered fluid>
+            <Card centered fluid className="profile-card">
               <Image
                 bordered
                 circular
@@ -248,20 +271,25 @@ const DashboardPage = () => {
                 size="small"
                 className="customCircularImage"
               />
-              <Card.Content>
-                <Card.Header>{userData.username}</Card.Header>
-                <Card.Meta>{userData.email}</Card.Meta>
+              <Card.Content className="profile-card-content">
+                <Card.Header className="profile-card-header">
+                  {userData.username}
+                </Card.Header>
+                <Card.Meta className="profile-card-meta">
+                  {userData.email}
+                </Card.Meta>
               </Card.Content>
-              <Card.Content extra>
+              <Card.Content extra className="profile-card-content">
                 <Button
                   basic
                   color="blue"
-                  onClick={() => setOpenEditProfileModal(true)} // Updated to use the new state
+                  onClick={() => setOpenEditProfileModal(true)}
                 >
                   Edit Profile
                 </Button>
               </Card.Content>
             </Card>
+
             <Header
               as="h2"
               dividing
@@ -297,18 +325,24 @@ const DashboardPage = () => {
               <Grid columns={3} divided>
                 {userData.vehicles.map((vehicle) => (
                   <Grid.Column key={vehicle.id}>
-                    <Segment>
-                      <Header as="h4">{vehicle.vehicleNumber}</Header>
-                      <p>{vehicle.fuelType}</p>
-                      <Button
-                        icon="edit"
-                        onClick={() => openVehicleEditModal(vehicle)}
-                      />
-                      <Button
-                        icon="trash"
-                        color="red"
-                        onClick={() => handleDeleteVehicle(vehicle.id)}
-                      />
+                    <Segment className="segment-card">
+                      <div className="segment-content">
+                        <div>
+                          <Header as="h4">{vehicle.vehicleNumber}</Header>
+                          <p>{vehicle.fuelType}</p>
+                        </div>
+                        <div className="segment-action-buttons">
+                          <Button
+                            icon="edit"
+                            onClick={() => openVehicleEditModal(vehicle)}
+                          />
+                          <Button
+                            icon="trash"
+                            color="red"
+                            onClick={() => handleDeleteVehicle(vehicle.id)}
+                          />
+                        </div>
+                      </div>
                     </Segment>
                   </Grid.Column>
                 ))}
@@ -318,148 +352,30 @@ const DashboardPage = () => {
             )}
           </Grid.Column>
         </Grid.Row>
+        {/* Modal components here */}
       </Grid>
-      <Modal
-        open={openEditModal}
-        onClose={() => setOpenEditModal(false)}
-        size="tiny"
-      >
-        <Modal.Header>Edit Vehicle</Modal.Header>
-        <Modal.Content>
-          <Form>
-            <Form.Field>
-              <label>Vehicle Number</label>
-              <input
-                placeholder="Vehicle Number"
-                name="vehicleNumber"
-                value={editVehicleData?.vehicleNumber || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>Fuel Type</label>
-              <Dropdown
-                placeholder="Select Fuel Type"
-                fluid
-                selection
-                options={fuelTypeOptions}
-                name="fuelType"
-                value={editVehicleData?.fuelType || ""}
-                onChange={(e, { name, value }) =>
-                  handleFormChange({ target: { name, value } })
-                }
-              />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setOpenEditModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            content="Save"
-            labelPosition="right"
-            icon="checkmark"
-            onClick={handleSaveVehicle}
-            positive
-          />
-        </Modal.Actions>
-      </Modal>
+      <EditVehicleModal
+  openEditModal={openEditModal}
+  setOpenEditModal={setOpenEditModal}
+  editVehicleData={editVehicleData}
+  handleFormChange={handleFormChange}
+  handleSaveVehicle={handleSaveVehicle}
+  fuelTypeOptions={fuelTypeOptions}
+/>
 
-      <Modal
-        open={openEditProfileModal} // Updated to use the new state
-        onClose={() => setOpenEditProfileModal(false)} // Updated to use the new state
-        size="tiny"
-      >
-        <Modal.Header>Edit Profile</Modal.Header>
-        <Modal.Content>
-          <Form>
-            <Form.Field>
-              <div className="image-upload-container">
-                <Image
-                  bordered
-                  circular
-                  spaced
-                  verticalAlign="middle"
-                  style={{
-                    marginTop: "10px",
-                    marginBottom: "10px",
-                    borderRadius: "5px",
-                  }}
-                  centered
-                  src={userData.userImage || "default_profile_image_url"}
-                  size="small"
-                  className="customCircularImage"
-                />
-                <div className="upload-icon">
-                  <Icon name="upload" />
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    style={{ cursor: "pointer" }} // Ensures the cursor is a pointer, indicating this is clickable
-                  />
-                </div>
-              </div>
+<EditProfileModal
+  openEditProfileModal={openEditProfileModal}
+  setOpenEditProfileModal={setOpenEditProfileModal}
+  userData={userData}
+  handleFileChange={handleFileChange}
+  handleUserFormChange={handleUserFormChange}
+  handleEditUser={handleEditUser}
+/>
 
-              <label>Username</label>
-              <input
-                placeholder="Username"
-                name="username"
-                value={userData.username}
-                onChange={handleUserFormChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>Email</label>
-              <input
-                placeholder="Email"
-                name="email"
-                value={userData.email}
-                onChange={handleUserFormChange}
-              />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setOpenEditProfileModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            content="Save"
-            labelPosition="right"
-            icon="checkmark"
-            onClick={handleEditUser}
-            positive
-          />
-        </Modal.Actions>
-      </Modal>
-      {/* <Modal
-        open={showLocationPermissionModal}
-        onClose={() => setShowLocationPermissionModal(false)}
-        size="tiny"
-      >
-        <Modal.Header>Location Access Required</Modal.Header>
-        <Modal.Content>
-          <p>
-            We need access to your location to provide localized services. Do
-            you agree to share your location with us?
-          </p>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button
-            negative
-            onClick={() => setShowLocationPermissionModal(false)}
-          >
-            No Thanks
-          </Button>
-          <Button positive onClick={fetchLocation}>
-            Yes, Proceed
-          </Button>
-        </Modal.Actions>
-      </Modal> */}
 
       {userData && userData.isActive && (
         <Button
+        centered
           primary
           onClick={handleFuelNowClick}
           style={{ marginTop: "20px" }}
@@ -467,7 +383,7 @@ const DashboardPage = () => {
           Fuel Now
         </Button>
       )}
-    </Segment>
+    </div>
   );
 };
 

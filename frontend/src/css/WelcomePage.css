@@ -1,0 +1,33 @@
+@import url(./variables.css);
+
+.welcome-backdrop {
+  position: relative;
+  text-align: center;
+  color: var(--text-primary); /* Use primary text color */
+  height: 100vh;
+  background-image: url('./../assets/welcomeImage.jpg'); /* Adjust path as necessary */
+  background-size: cover; /* Cover the entire page, corrected from unset to cover */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+}
+
+.background-video {
+  /* Uncommented and adjusted based on your requirements */
+  width: 100%;
+  height: 100vh;
+  object-fit: cover; /* Assuming you want to cover the video to the whole viewport */
+}
+
+.overlay-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; /* Ensure this is above the z-index of the image if specified */
+  color: var(--text-primary); /* Assuming you want to use the primary text color here */
+}
+
+/* If your image is absolutely positioned or has a specific z-index, you might need this */
+.image {
+  z-index: 1; /* Ensure this is lower than the overlay-content z-index */
+}

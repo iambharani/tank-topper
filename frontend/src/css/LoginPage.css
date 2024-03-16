@@ -1,0 +1,12 @@
+@import url(./variables.css);
+
+.backDrop{
+    position: relative;
+    text-align: center;
+    color: white;
+    height: 100vh;
+    background-image: url('./../assets/welcomeImage.jpg'); /* Adjust path as necessary */
+    background-size:unset; /* Cover the entire page */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+}

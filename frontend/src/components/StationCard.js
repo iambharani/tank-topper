@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from 'semantic-ui-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGasPump, faCrosshairs, faMoneyBill,faLocationDot } from '@fortawesome/free-solid-svg-icons';
-import './StationCard.css'
+import './../css/StationCard.css'
 const StationCard = ({ station, onSelect }) => {
   return (
     <Card className='stationcard-card' fluid onClick={() => onSelect(station)} style={{ cursor: 'pointer', margin: '10px', padding: '10px', border: '1px solid #ccc' }}>

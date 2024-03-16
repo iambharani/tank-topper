@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { Button, Form, Grid, Header, Segment } from 'semantic-ui-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './LoginPage.css';
+import './../css/LoginPage.css';
 import { setCurrentUser } from './../actions/authActions'; // Update this path
 
 const LoginComponent = () => {

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import MapComponent from "../components/MapComponent";
 import { Container, Header, Card, Button } from "semantic-ui-react";
 
-import "./MapPage.css";
+import "./../css/MapPage.css";
 const MapPage = () => {
   const navigate = useNavigate();
   const location = useLocation();

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Container, Header, Image } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import "./WelcomePage.css"; // Import the CSS for additional styling
+import "./../css/WelcomePage.css"; // Import the CSS for additional styling
 import welcomeImage from "./../assets/welcomeImage.jpg"; // Adjust the path as necessary
 
 const WelcomePage = () => {

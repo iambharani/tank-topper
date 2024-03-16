@@ -1,0 +1,40 @@
+:root {
+    /* Primary and Secondary Colors */
+    --primary-color: #00b7ff;
+    --secondary-color: #ff5722;
+    --accent-color: #ffd740;
+  
+    /* Neutral Colors */
+    --neutral-light: #f5f5f5;
+    --neutral-dark: #263238;
+  
+    /* Highlight Color */
+    --highlight-color: #e0f7fa;
+  
+    /* Text Colors */
+    --text-primary: #263238;
+    --text-secondary: #607d8b;
+  
+    /* Button Colors */
+    --button-default-bg: var(--primary-color);
+    --button-default-text: #ffffff;
+    --button-hover-bg: #0091ea;
+    --button-hover-text: #ffffff;
+  
+    /* Link Colors */
+    --link-color: var(--primary-color);
+    --link-hover-color: #0091ea;
+  
+    /* Header Components */
+    --header-bg: var(--neutral-dark);
+    --header-text: #ffffff;
+    --dropdown-bg: #37474f;
+    --dropdown-text: #ffffff;
+  
+    /* List Items & Dropdowns */
+    --list-item-bg: #ffffff;
+    --list-item-hover-bg: var(--highlight-color);
+    --dropdown-item-bg: var(--neutral-light);
+    --dropdown-item-text: var(--text-primary);
+  }
+  

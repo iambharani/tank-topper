@@ -1,0 +1,23 @@
+@import url(./variables.css);
+.custom-menu {
+  background-color: var(--primary-color) !important; /* Utilizes the primary color variable */
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26) !important; /* Adds a subtle shadow */
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important; /* Ensures the menu stays on top of other content */
+  min-height: 60px !important;
+}
+
+/* Optional: Adjust the color of the menu item text to improve contrast */
+.custom-menu .custom-menu-item, .custom-menu .item {
+  color: var(--header-text) !important; /* Updated to use header text color variable */
+}
+
+/* Optional: Change dropdown menu styling */
+.custom-menu .dropdown .menu {
+  border-color: var(--primary-color) !important; /* Utilizes the primary color variable for consistency */
+}
+
+.custom-menu .dropdown .menu .item {
+  color: var(--primary-color) !important; /* Utilizes the primary color variable for a consistent look */
+}

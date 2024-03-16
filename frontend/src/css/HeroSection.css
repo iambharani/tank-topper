@@ -1,0 +1,37 @@
+@import url(./variables.css);
+.hero-section {
+  background-image: url('./../../frontend/src/assets/hero.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 100px 0;
+  position: relative;
+  color: var(--text-primary); /* Updated to use variable */
+  margin-bottom: 25px;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: rgba(0, 0, 0, 0.5); /* Dark overlay for better text readability */
+}
+
+.hero-content {
+  position: relative; /* Ensure the content is above the ::before overlay */
+}
+
+.hero-button {
+  background: linear-gradient(to right, var(--primary-color), var(--button-hover-bg)); /* Updated to use variables */
+  color: var(--button-default-text); /* Updated to use variable */
+  border: none;
+}
+
+.hero-button:hover {
+  background: linear-gradient(to right, #0056b3, var(--button-hover-bg)); /* Partly updated to use variable */
+}
+
+/* Add this if your project doesn't already handle button focus outline for accessibility */
+.hero-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Consider using a variable for color if applicable */
+}

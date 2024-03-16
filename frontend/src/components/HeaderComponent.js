@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { logoutUser } from './../actions/authActions';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirects
 import 'semantic-ui-css/semantic.min.css';
-import './HeaderComponent.css';
+import './../css/HeaderComponent.css';
 
 const HeaderComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
